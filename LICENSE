@@ -1,0 +1,49 @@
+BATTERYGUARDIAN (LSPosed/Xposed Module + Companion App) — PROPRIETARY LICENSE
+
+Copyright (c) 2026. All rights reserved.
+
+ENGLISH
+1) License Grant
+This software (including, without limitation, source code, binaries, resources, and documentation) is provided to you for personal use only.
+
+2) Restrictions
+Unless you have obtained prior written permission from the copyright holder, you may NOT:
+- copy, reproduce, redistribute, publish, or share the Software (in whole or in part);
+- modify, adapt, translate, reverse engineer, decompile, disassemble, or create derivative works;
+- remove or alter any copyright, trademark, or attribution notices;
+- sell, sublicense, rent, lease, or otherwise commercialize the Software.
+
+3) No Warranty (AS IS)
+THE SOFTWARE IS PROVIDED “AS IS” AND “AS AVAILABLE”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+4) Limitation of Liability
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, WITHOUT LIMITATION, DATA LOSS, DEVICE MALFUNCTION, OR INTERRUPTION OF SERVICE) ARISING FROM OR RELATED TO THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+5) High-Risk Notice
+This Software may change device power/battery behavior and may increase the risk of data loss or file-system corruption if the device loses power unexpectedly. You assume all responsibility and risk for installing and using the Software.
+
+6) Termination
+Any breach of this license terminates your permission to use the Software immediately.
+
+RUSSIAN / РУССКИЙ
+1) Предоставление лицензии
+Данное программное обеспечение (включая исходный код, бинарные файлы, ресурсы и документацию) предоставляется только для личного использования.
+
+2) Ограничения
+Без предварительного письменного разрешения правообладателя запрещено:
+- копировать, воспроизводить, распространять, публиковать или передавать ПО полностью или частично;
+- изменять, адаптировать, переводить, выполнять обратную разработку, декомпиляцию, дизассемблирование или создавать производные работы;
+- удалять или изменять уведомления об авторских правах, товарных знаках и атрибуции;
+- продавать, сдавать в аренду, сублицензировать или иным образом коммерциализировать ПО.
+
+3) Отказ от гарантий (AS IS)
+ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ ПРЕДОСТАВЛЯЕТСЯ «КАК ЕСТЬ» И «КАК ДОСТУПНО» БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, ЯВНЫХ ИЛИ ПОДРАЗУМЕВАЕМЫХ, ВКЛЮЧАЯ, НО НЕ ОГРАНИЧИВАЯСЬ, ГАРАНТИЯМИ ТОВАРНОЙ ПРИГОДНОСТИ, ПРИГОДНОСТИ ДЛЯ КОНКРЕТНОЙ ЦЕЛИ И НЕНАРУШЕНИЯ ПРАВ.
+
+4) Ограничение ответственности
+В МАКСИМАЛЬНО ДОПУСТИМОЙ ЗАКОНОМ СТЕПЕНИ ПРАВООБЛАДАТЕЛЬ НЕ НЕСЁТ ОТВЕТСТВЕННОСТИ ЗА ЛЮБОЙ ПРЯМОЙ ИЛИ КОСВЕННЫЙ УЩЕРБ, ВКЛЮЧАЯ ПОТЕРЮ ДАННЫХ, НЕИСПРАВНОСТЬ УСТРОЙСТВА ИЛИ ПРЕРЫВАНИЕ РАБОТЫ, ВОЗНИКШИЕ В СВЯЗИ С ИСПОЛЬЗОВАНИЕМ ИЛИ НЕВОЗМОЖНОСТЬЮ ИСПОЛЬЗОВАНИЯ ПО, ДАЖЕ ЕСЛИ О ВОЗМОЖНОСТИ ТАКОГО УЩЕРБА БЫЛО ИЗВЕСТНО.
+
+5) Уведомление о повышенном риске
+ПО может изменять поведение питания/батареи устройства и повышать риск потери данных или повреждения файловой системы при внезапном отключении питания. Устанавливая и используя ПО, вы принимаете на себя все риски и ответственность.
+
+6) Прекращение действия
+Любое нарушение условий лицензии немедленно прекращает ваше право использования ПО.
