@@ -114,4 +114,9 @@ See `LICENSE.txt`.
 
 ## Лицензия
 Проект **закрытый**: копирование, редактирование и распространение запрещены.
-См. `LICENSE`.
+См. `LICENSE.txt`.
+
+
+## Signing (Release)
+
+See `SIGNING.md`.
