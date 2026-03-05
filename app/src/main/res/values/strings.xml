@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Battery Guardian</string>
+    <string name="xposed_description">Configurable protection against critical battery shutdown</string>
+
+    <string name="info_intro">Keeps the phone from shutting down at 0% using LSPosed/System framework. Choose a mode below. Permanent mode may cause data loss if power drops suddenly.</string>
+    <string name="current_battery_value">Battery: %1$d%%%2$s</string>
+
+    <string name="enable_service">Enable service</string>
+    <string name="enable_logging">Enable logging (LSPosed log)</string>
+
+    <string name="mode_title">Mode</string>
+    <string name="mode_voltage">Voltage</string>
+    <string name="mode_timer">Timer</string>
+    <string name="mode_permanent">Permanent</string>
+
+    <string name="voltage_threshold_hint">Shutdown voltage threshold (mV)</string>
+    <string name="voltage_confirm_hint">Confirm time (seconds)</string>
+    <string name="timer_minutes_hint">Hold time (minutes)</string>
+
+    <string name="permanent_warning">Warning: Permanent mode blocks shutdown continuously. If the battery dies abruptly, you may lose data or corrupt the file system.</string>
+    <string name="permanent_confirm">I understand the risk</string>
+    <string name="permanent_confirm_required">Please confirm the risk to enable Permanent mode.</string>
+
+    <string name="save_settings">Save</string>
+    <string name="saved_message">Saved.</string>
+
+    <string name="disclaimer_title">Important notice</string>
+    <string name="disclaimer_message">This module can change how your device behaves at critically low battery levels and may prevent a normal shutdown at 0%. This is potentially unsafe. Sudden power loss can cause data loss, file system corruption, and instability.\n\nBy continuing, you confirm that you understand the risks and that you take full responsibility for using this module.</string>
+    <string name="disclaimer_agree">I agree and accept responsibility</string>
+    <string name="disclaimer_accept">Continue</string>
+    <string name="disclaimer_decline">Decline</string>
+</resources>

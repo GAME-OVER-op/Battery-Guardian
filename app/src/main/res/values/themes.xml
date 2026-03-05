@@ -1,0 +1,13 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Dark-only theme -->
+    <style name="Theme.BatteryGuardian" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">#5B5BD6</item>
+        <item name="colorSecondary">#8F68FF</item>
+
+        <!-- Make system bars match dark UI -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+    </style>
+</resources>
