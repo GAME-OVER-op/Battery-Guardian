@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Battery Guardian</string>
+    <string name="xposed_description">Настраиваемая защита от критического выключения батареи</string>
+
+    <string name="info_intro">Не даёт телефону выключаться на 0% через LSPosed/System framework. Выберите режим ниже. Режим «Постоянный» может привести к потере данных при резком обрыве питания.</string>
+    <string name="current_battery_value">Батарея: %1$d%%%2$s</string>
+
+    <string name="enable_service">Включить службу</string>
+    <string name="enable_logging">Логи (LSPosed log)</string>
+
+    <string name="mode_title">Режим</string>
+    <string name="mode_voltage">По вольтажу</string>
+    <string name="mode_timer">По таймеру</string>
+    <string name="mode_permanent">Постоянный</string>
+
+    <string name="voltage_threshold_hint">Порог выключения по напряжению (mV)</string>
+    <string name="voltage_confirm_hint">Подтверждение (секунды)</string>
+    <string name="timer_minutes_hint">Время удержания (минуты)</string>
+
+    <string name="permanent_warning">Внимание: режим «Постоянный» блокирует выключение постоянно. При резком обрыве питания возможна потеря данных или повреждение файловой системы.</string>
+    <string name="permanent_confirm">Я понимаю риск</string>
+    <string name="permanent_confirm_required">Подтвердите риск, чтобы включить режим «Постоянный».</string>
+
+    <string name="save_settings">Сохранить</string>
+    <string name="saved_message">Сохранено.</string>
+
+    <string name="disclaimer_title">Важная информация</string>
+    <string name="disclaimer_message">Этот модуль может изменять поведение устройства при критически низком заряде и способен предотвращать штатное выключение на 0%. Это потенциально небезопасно. Резкое отключение питания может привести к потере данных, повреждению файловой системы и нестабильной работе.\n\nПродолжая, вы подтверждаете, что понимаете риски и берёте на себя полную ответственность за использование модуля.</string>
+    <string name="disclaimer_agree">Я согласен и принимаю ответственность</string>
+    <string name="disclaimer_accept">Продолжить</string>
+    <string name="disclaimer_decline">Отказаться</string>
+</resources>
