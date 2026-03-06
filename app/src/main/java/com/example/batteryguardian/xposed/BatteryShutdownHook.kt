@@ -101,7 +101,7 @@ class BatteryShutdownHook : IXposedHookLoadPackage {
                                     return
                                 }
 
-                                val threshold = settings.voltageThresholdMv.coerceIn(2500, 4500)
+                                val threshold = settings.voltageThresholdMv.coerceAtLeast(0)
                                 val confirmMs = settings.voltageConfirmSeconds.coerceIn(0, 120) * 1000L
 
                                 val now = System.currentTimeMillis()
