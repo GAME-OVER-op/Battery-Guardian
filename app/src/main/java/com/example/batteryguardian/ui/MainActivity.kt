@@ -2,8 +2,10 @@ package com.example.batteryguardian.ui
 
 import android.os.BatteryManager
 import android.os.Bundle
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.batteryguardian.R
@@ -77,6 +79,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupUi() = with(binding) {
 
+        testShutdownButton.setOnClickListener {
+            showTestShutdownDialog()
+        }
+
         modeGroup.setOnCheckedChangeListener { _, _ ->
             updateModeVisibility()
         }
@@ -104,6 +110,36 @@ class MainActivity : AppCompatActivity() {
             infoText.text = getString(R.string.saved_message)
             updateModeVisibility()
         }
+    }
+
+    private fun showTestShutdownDialog() {
+        val content = LayoutInflater.from(this).inflate(R.layout.dialog_test_shutdown, null)
+        val agree = content.findViewById<android.widget.CheckBox>(R.id.testShutdownAgree)
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(getString(R.string.test_shutdown_title))
+            .setView(content)
+            .setCancelable(true)
+            .setPositiveButton(getString(R.string.test_shutdown_confirm), null)
+            .setNegativeButton(getString(R.string.test_shutdown_cancel)) { d, _ -> d.dismiss() }
+            .create()
+
+        dialog.setOnShowListener {
+            val positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            positive.isEnabled = false
+            agree.setOnCheckedChangeListener { _, isChecked ->
+                positive.isEnabled = isChecked
+            }
+            positive.setOnClickListener {
+                if (!agree.isChecked) return@setOnClickListener
+                // Send broadcast to system_server (receiver registered by the LSPosed module)
+                sendBroadcast(Intent(ACTION_TEST_SHUTDOWN).setPackage("android"))
+                Toast.makeText(this, getString(R.string.test_shutdown_sent), Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }
+        }
+
+        dialog.show()
     }
 
     private fun loadSettings() {
@@ -165,6 +201,7 @@ class MainActivity : AppCompatActivity() {
     private companion object {
         const val PREFS_UI = "battery_guardian_ui"
         const val KEY_DISCLAIMER_ACCEPTED = "disclaimer_accepted"
+        const val ACTION_TEST_SHUTDOWN = "com.example.batteryguardian.ACTION_TEST_SHUTDOWN"
     }
 
 }
