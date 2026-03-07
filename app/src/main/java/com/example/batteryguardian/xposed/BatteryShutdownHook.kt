@@ -1,6 +1,9 @@
 package com.example.batteryguardian.xposed
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
@@ -12,11 +15,45 @@ class BatteryShutdownHook : IXposedHookLoadPackage {
 
     private var timerStartMs: Long? = null
     private var lowVoltageSinceMs: Long? = null
+    private var shutdownRequested: Boolean = false
+    private var receiverRegistered: Boolean = false
+
+    private val testShutdownReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action != ACTION_TEST_SHUTDOWN) return
+            val settings = readSettings(context)
+            if (!settings.enabled) {
+                log(settings.loggingEnabled, "Test shutdown requested, but module is disabled. Ignoring.")
+                return
+            }
+            if (!shutdownRequested) {
+                shutdownRequested = true
+                clearHoldState()
+                requestShutdown(context, settings.loggingEnabled, "BatteryGuardian:Test")
+            }
+        }
+    }
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         if (lpparam.packageName != "android") return
 
         try {
+            // Register broadcast receiver as early as possible (BatteryService constructor).
+            // This allows triggering a test shutdown even when the battery isn't critical yet.
+            runCatching {
+                XposedHelpers.findAndHookConstructor(
+                    "com.android.server.BatteryService",
+                    lpparam.classLoader,
+                    Context::class.java,
+                    object : XC_MethodHook() {
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            val ctx = param.args.getOrNull(0) as? Context ?: return
+                            ensureReceiverRegistered(ctx)
+                        }
+                    }
+                )
+            }
+
             XposedHelpers.findAndHookMethod(
                 "com.android.server.BatteryService",
                 lpparam.classLoader,
@@ -27,9 +64,11 @@ class BatteryShutdownHook : IXposedHookLoadPackage {
                         val context = XposedHelpers.getObjectField(param.thisObject, "mContext") as? Context
                             ?: return
 
+                        ensureReceiverRegistered(context)
+
                         val settings = readSettings(context)
                         if (!settings.enabled) {
-                            resetState()
+                            resetAllState()
                             return
                         }
 
@@ -45,13 +84,13 @@ class BatteryShutdownHook : IXposedHookLoadPackage {
                         // Absolute safety floor: if we ever see <= -20, do not block shutdown.
                         if (level <= -20) {
                             log(settings.loggingEnabled, "Safety floor reached (level=$level). Allowing shutdown.")
-                            resetState()
+                            resetAllState()
                             return
                         }
 
                         // If we're above 0, reset mode-specific state. We only "hold" around 0 and below.
                         if (level > 0) {
-                            resetState()
+                            resetAllState()
                             return
                         }
 
@@ -59,7 +98,7 @@ class BatteryShutdownHook : IXposedHookLoadPackage {
                             HoldMode.PERMANENT -> {
                                 if (!settings.permanentConfirmed) {
                                     log(settings.loggingEnabled, "Permanent mode not confirmed in UI. Allowing shutdown.")
-                                    resetState()
+                                    resetAllState()
                                     return
                                 }
                                 log(settings.loggingEnabled, "Permanent hold active. Blocking shutdown. level=$level")
@@ -83,7 +122,15 @@ class BatteryShutdownHook : IXposedHookLoadPackage {
                                         settings.loggingEnabled,
                                         "Timer expired: allowing shutdown. level=$level elapsed=${elapsedMs / 1000}s"
                                     )
-                                    resetState()
+                                    // Some ROMs only attempt shutdown once. If we previously blocked it,
+                                    // simply "allowing" may never trigger a shutdown again.
+                                    // Therefore, explicitly request shutdown once when the condition is met.
+                                    if (!shutdownRequested) {
+                                        shutdownRequested = true
+                                        clearHoldState()
+                                        requestShutdown(context, settings.loggingEnabled, "BatteryGuardian:Timer")
+                                    }
+                                    param.result = true
                                 }
                             }
 
@@ -114,7 +161,12 @@ class BatteryShutdownHook : IXposedHookLoadPackage {
                                             settings.loggingEnabled,
                                             "Voltage threshold reached: allowing shutdown. V=${voltageMv}mV <= ${threshold}mV for ${lowForMs}ms"
                                         )
-                                        resetState()
+                                        if (!shutdownRequested) {
+                                            shutdownRequested = true
+                                            clearHoldState()
+                                            requestShutdown(context, settings.loggingEnabled, "BatteryGuardian:Voltage")
+                                        }
+                                        param.result = true
                                     } else {
                                         log(
                                             settings.loggingEnabled,
@@ -144,8 +196,85 @@ class BatteryShutdownHook : IXposedHookLoadPackage {
     }
 
     private fun resetState() {
+        clearHoldState()
+        shutdownRequested = false
+    }
+
+    private fun clearHoldState() {
         timerStartMs = null
         lowVoltageSinceMs = null
+    }
+
+    private fun resetAllState() {
+        clearHoldState()
+        shutdownRequested = false
+    }
+
+    private fun ensureReceiverRegistered(context: Context) {
+        if (receiverRegistered) return
+        runCatching {
+            val filter = IntentFilter(ACTION_TEST_SHUTDOWN)
+
+            // Android 13+ requires specifying whether a dynamically registered receiver is exported.
+            // We WANT exported here because the request is triggered from the companion app.
+            val exportedFlag = runCatching {
+                Context::class.java.getField("RECEIVER_EXPORTED").getInt(null)
+            }.getOrDefault(0)
+
+            val m = runCatching {
+                // Context.registerReceiver(BroadcastReceiver, IntentFilter, int)
+                context.javaClass.getMethod("registerReceiver", BroadcastReceiver::class.java, IntentFilter::class.java, Int::class.javaPrimitiveType)
+            }.getOrNull()
+
+            if (m != null) {
+                m.invoke(context, testShutdownReceiver, filter, exportedFlag)
+            } else {
+                // Pre-Android 13
+                context.registerReceiver(testShutdownReceiver, filter)
+            }
+
+            receiverRegistered = true
+            XposedBridge.log("BatteryGuardian: test-shutdown receiver registered (exportedFlag=$exportedFlag)")
+        }.onFailure {
+            XposedBridge.log("BatteryGuardian: receiver register failed: ${it.stackTraceToString()}")
+        }
+    }
+
+    private fun requestShutdown(context: Context, logging: Boolean, reason: String) {
+        runCatching {
+            log(logging, "Requesting shutdown (reason=$reason)")
+            // PowerManager.shutdown(...) is hidden in the public SDK, so we call the system power service via reflection.
+            // 1) Prefer IPowerManager.shutdown(...) (system_server has the permission).
+            runCatching {
+                val sm = Class.forName("android.os.ServiceManager")
+                val getService = sm.getMethod("getService", String::class.java)
+                val binder = getService.invoke(null, "power") as android.os.IBinder
+
+                val stub = Class.forName("android.os.IPowerManager\$Stub")
+                val asInterface = stub.getMethod("asInterface", android.os.IBinder::class.java)
+                val iPowerManager = asInterface.invoke(null, binder)
+
+                val m = iPowerManager.javaClass.getMethod(
+                    "shutdown",
+                    Boolean::class.javaPrimitiveType,
+                    String::class.java,
+                    Boolean::class.javaPrimitiveType
+                )
+                m.invoke(iPowerManager, false, reason, false)
+            }.recoverCatching {
+                // 2) Fallback: reflect PowerManager.shutdown(...)
+                val pm = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+                val m = pm.javaClass.getMethod(
+                    "shutdown",
+                    Boolean::class.javaPrimitiveType,
+                    String::class.java,
+                    Boolean::class.javaPrimitiveType
+                )
+                m.invoke(pm, false, reason, false)
+            }.getOrThrow()
+        }.onFailure {
+            XposedBridge.log("BatteryGuardian: shutdown request failed: ${it.stackTraceToString()}")
+        }
     }
 
     private fun readSettings(context: Context): HookSettings {
@@ -182,6 +311,10 @@ class BatteryShutdownHook : IXposedHookLoadPackage {
             runCatching { return XposedHelpers.getIntField(obj, n) }.getOrNull()
         }
         return null
+    }
+
+    private companion object {
+        const val ACTION_TEST_SHUTDOWN = "com.example.batteryguardian.ACTION_TEST_SHUTDOWN"
     }
 
     private data class HookSettings(
